@@ -1,0 +1,4 @@
+.stack-work/
+test-haskell.cabal
+*~
+.idea
