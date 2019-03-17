@@ -145,5 +145,5 @@ pack (x:xs) =
 
 -- Return elements and their sequential frequencies.
 encode :: Eq a => [a] -> [(Int, a)]
--- Packs the list and computes length of every sub-list into tuple.
+-- Packs the list and computes length of every sub-list into a tuple.
 encode = map (\l -> (length l, head l)) . pack
