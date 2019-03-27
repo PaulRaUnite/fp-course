@@ -1,6 +1,5 @@
 module Pack3 where
 
-import           Control.Monad (replicateM)
 import           Data.List     (sortBy, tails)
 import           Data.Map      (empty, insertWith, (!))
 import           Pack1         (elementAt)
@@ -34,7 +33,7 @@ betterRange from to
 rndSelect :: [a] -> Int -> IO [a]
 rndSelect xs n = do
   gen <- getStdGen
-  return $ take n [elementAt xs (x + 1) | x <- randomRs (0, length xs - 1) gen]
+  return $ take n [xs !! x | x <- randomRs (0, length xs - 1) gen]
 
 -- Return N different random numbers from the set 1..M.
 -- λ> diffSelect 6 49
@@ -93,7 +92,7 @@ toIndexes list x = list !! x
 group :: Eq a => (Int, Int, Int) -> [a] -> [[[a]]]
 group (f, s, t) list =
   map
-    (map (map (list !!)))
+    (map $ map (list !!))
     [ [fl, sl, [x | x <- indexes, x `notElem` (fl ++ sl)]]
     | fl <- combinations f indexes
     , sl <- combinations s [x | x <- indexes, x `notElem` fl]
