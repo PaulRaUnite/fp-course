@@ -1,7 +1,7 @@
 module BinaryTrees where
 
-import           Data.Maybe (fromMaybe)
-import           Prelude    hiding ((<=), (^))
+import           Data.Maybe        (fromMaybe)
+import           Prelude           hiding ((<=), (^))
 
 data BTree a
   = Empty
@@ -48,7 +48,7 @@ equalUnordered Empty _ = False
 equalUnordered _ Empty = False
 equalUnordered (Branch v1 left1 right1) (Branch v2 left2 right2) =
   v1 == v2 &&
-  (equalUnordered left1 left2 && equalUnordered right1 right2)||
+  (equalUnordered left1 left2 && equalUnordered right1 right2 ||
    equalUnordered left1 right2 && equalUnordered right1 left2)
 
 (<=) :: BTree a -> BTree a -> BTree a
