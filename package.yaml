@@ -23,6 +23,8 @@ dependencies:
   - base >= 4.7 && < 5
   - random
   - containers
+  - split
+  - MissingH
 
 library:
   source-dirs: src
