@@ -25,6 +25,8 @@ dependencies:
   - containers
   - split
   - MissingH
+  - mtl
+  - array
 
 library:
   source-dirs: src
