@@ -2,7 +2,6 @@ module Main where
 
 import           Data.Array
 import           Labyrinth
-import           Pack1
 import           System.Random (getStdGen, randomRs)
 
 main :: IO ()
