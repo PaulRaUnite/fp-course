@@ -53,7 +53,7 @@ import           Data.List           (delete, find)
 import           Control.Monad.State
 import           Prelude
 
-
+import           Data.Maybe
 import           Debug.Trace         (trace)
 
 {- --------------------------------------------------------------------------
@@ -71,7 +71,7 @@ type MazeM a = State StdGen a -- our MazeM monad is just a State monad
 rnd :: (Int, Int) -> MazeM Int
 rnd rng -- kernel function to generate a random num
  = do
-  (x, gen') <- liftM (randomR rng) get
+  (x, gen') <- gets (randomR rng)
   put gen'
   return x
 
@@ -125,16 +125,16 @@ fixPos maze = do
 -- Check to see whether moving in the given direction from the given point
 -- does not take us beyond the bounds of the maze
 moveIsInBounds :: Maze -> Point -> Dir -> Bool
-moveIsInBounds maze pos North = (y pos) > 0
-moveIsInBounds maze pos West  = (x pos) > 0
-moveIsInBounds maze pos East  = (x pos) + 1 < width maze
-moveIsInBounds maze pos South = (y pos) + 1 < height maze
+moveIsInBounds maze pos North = y pos > 0
+moveIsInBounds maze pos West  = x pos > 0
+moveIsInBounds maze pos East  = x pos + 1 < width maze
+moveIsInBounds maze pos South = y pos + 1 < height maze
 
 -- Check to see whether the move from the given point in the given direction
 -- is legal (meaning, it won't take us beyond the bounds of the array, and
 -- the cell in that direction is unvisited)
 availableDirection :: Maze -> Point -> Dir -> Bool
-availableDirection maze pos dir = (moveIsInBounds maze pos dir) && (null $ maze ! movePos pos dir)
+availableDirection maze pos dir = moveIsInBounds maze pos dir && null (maze ! movePos pos dir)
 
 -- Update the maze such that a connection is created between the given cell
 -- and the neighboring cell in the given direction
@@ -142,11 +142,11 @@ assertConnection :: Maze -> Point -> Dir -> Maze
 assertConnection maze pos dir = maze // changes
   where
     newPos = movePos pos dir
-    changes = [(pos, dir : (maze ! pos)), (newPos, (oppositeDir dir) : (maze ! newPos))]
+    changes = [(pos, dir : (maze ! pos)), (newPos, oppositeDir dir : (maze ! newPos))]
 
 -- Return True if the given list of directions includes the given direction
 hasDir :: Dir -> [Dir] -> Bool
-hasDir dir dirs = Nothing /= (find (== dir) dirs)
+hasDir dir dirs = Data.Maybe.isJust (find (== dir) dirs)
 
 -- Return a new point that is the result of moving from the given point in the
 -- given direction
@@ -205,16 +205,16 @@ render maze = renders maze 0
 renders :: Maze -> Int -> String
 renders maze row =
   if row < height maze
-    then (renderRow maze row) ++ "\n" ++ (renderUnderRow maze row) ++ "\n" ++ (renders maze (row + 1))
+    then renderRow maze row ++ "\n" ++ renderUnderRow maze row ++ "\n" ++ renders maze (row + 1)
     else ""
   where
-    renderRow maze row = concat [renderCell (maze ! (Pt x row)) | x <- [0 .. (width maze) - 1]]
-    renderCell dirs = (renderh West dirs) ++ "+" ++ (renderh East dirs)
+    renderRow maze row = concat [renderCell (maze ! Pt x row) | x <- [0 .. width maze - 1]]
+    renderCell dirs = renderh West dirs ++ "+" ++ renderh East dirs
     renderh dir dirs =
       if hasDir dir dirs
         then "-"
         else " "
-    renderUnderRow maze row = concat [renderUnderCell $ maze ! Pt x row | x <- [0 .. (width maze) - 1]]
+    renderUnderRow maze row = concat [renderUnderCell $ maze ! Pt x row | x <- [0 .. width maze - 1]]
     renderUnderCell dirs =
       " " ++
       (if hasDir South dirs
@@ -223,7 +223,6 @@ renders maze row =
       " "
 
 -- MY solver (left hand based)
-
 nextDir :: Dir -> Dir
 nextDir North = East
 nextDir East  = South
